@@ -1,4 +1,6 @@
 <?php
+ini_set('max_execution_time', 0);
+	
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
 	// Read all recieved data
 	$input_sequence = trim($_POST["ta_sequence"]);
@@ -160,9 +162,49 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 		$command .= " --maxseqlen=".$max_seq_length;
 	}	
 	
+	$command .= " --force";
 	$command .= " > console_out.txt 2>&1";
 	`$command`;
-	$output = read_file('console_out.txt');
+	
+	// Output files:
+	//    out.txt
+	//    dist_matr_out.txt
+	//    guide_tree_out.txt
+	//    cluster_out.txt
+	$output = "";
+	$output .= read_file('console_out.txt');
+	$output = str_replace("file ../../progr/input.txt", "file or input", $output);
+	$output .= "<br/>";
+	
+	if(file_exists($progr_dir."out.txt")){
+		$output .= "<h3>Подредена секвенция:</h3><br/>";
+		$output .= "<textarea name=\"ordered_seq\" rows=\"15\" cols=\"70\">";
+		$output .= read_file($progr_dir."out.txt");
+		unlink($progr_dir."out.txt");
+		$output .= "</textarea><br/>";
+	}
+	else{
+		$output .= "<b>Неуспешно генериране на подредена секвенция. Вижте грешките по-горе.</b><br/>";
+	}
+	if(file_exists($progr_dir."dist_matr_out.txt")){
+		$output .= "<h3>Матрица на разпределението:</h3>";
+		$output .= "<textarea name=\"dist_matr\" rows=\"15\" cols=\"70\">";
+		$output .= read_file($progr_dir."dist_matr_out.txt");
+		$output .= "</textarea><br/>";	
+	}
+	if(file_exists($progr_dir."guide_tree_out.txt")){
+		$output .= "<h3>Дърво на следенето(guide-tree):</h3><br/>";
+		$output .= "<textarea name=\"guide_tree\" rows=\"15\" cols=\"70\">";
+		$output .= read_file($progr_dir."guide_tree_out.txt");
+		$output .= "</textarea><br/>";	
+	}
+	if(file_exists($progr_dir."cluster_out.txt")){
+		$output .= "<h3>Клъстериране:</h3><br/>";
+		$output .= "<textarea name=\"cluster\" rows=\"15\" cols=\"70\">";
+		$output .= read_file($progr_dir."cluster_out.txt");
+		$output .= "</textarea><br/>";	
+	}
+	
 	echo $output;
 	
 	/*
@@ -216,10 +258,15 @@ function create_file($location, $content){
 }
 
 function read_file($location){
-	$fh = fopen($location, 'r')
-		or die("can't open file");
-	$contents = fread($fh, filesize($location));
-	fclose($fh);
-	return $contents;
+	if (is_readable($location) && filesize($location)>0){
+		$fh = fopen($location, 'r')
+			or die("can't open file");
+		$contents = fread($fh, filesize($location));
+		fclose($fh);
+		return $contents;
+	}
+	else{
+		return "";
+	}
 }
 ?>

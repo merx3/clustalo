@@ -1,2 +1,0 @@
-
-FATAL: Parse error: no sequences were found for alignment 
