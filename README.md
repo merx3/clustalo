@@ -10,4 +10,4 @@ To run under Windows:<br/>
 3. Paste the content of this repo in C:\wamp\www\clustalo (create the clustalo directory)<br/>
 4. Open your browser and go to http://localhost/clustalo 
 <br/><br/>
-This program has been realised with the third-party software &reg; Clustal Omega: http://www.clustal.org/omega/
+This web portal has been realised using the third-party software &reg; Clustal Omega: http://www.clustal.org/omega/
