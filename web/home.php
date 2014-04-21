@@ -47,10 +47,6 @@ Clustel Omega
 							<li><a href="https://www.ebi.ac.uk/Tools/msa/clustalo/">EMBL-EBI ClustalO</a></li>
 							<li><a href="http://www.clustal.org/omega/">Link2</a>Clustal Omega</li>
 							<li><a href="http://www.ncbi.nlm.nih.gov/">NCBI</a></li>
-						</ul>
-
-						<h5>Not so helpful sites</h5>
-						<ul>
 							<li><a href="http://www.tu-sofia.bg">TU-Sofia</a></li>
 						</ul>
 						
