@@ -35,7 +35,7 @@
 				Pre-aligned файл с множество секвенции(незадължително):<br/> 
 					<input type="hidden" name="MAX_FILE_SIZE" value="1000000" />
 					&nbsp;&nbsp;&nbsp;&nbsp;<input name="pre_align_in1" type="file" /><br/>
-				Pre-aligned файл с множество секвенции(незадължително):<br/> 
+				Pre-aligned файл с множество секвенции(допълнителен, незадължително):<br/> 
 					<input type="hidden" name="MAX_FILE_SIZE" value="1000000" />
 					&nbsp;&nbsp;&nbsp;&nbsp;<input name="pre_align_in2" type="file" /><br/>
 				Пропусни проверка за коректност на профила: <input name="check_corrrect_prof" type="checkbox"></input><br/>
