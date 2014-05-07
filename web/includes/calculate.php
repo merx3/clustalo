@@ -12,6 +12,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 	}
 	$seq_type = $_POST["seq_type"];
 	$in_file_format = $_POST["in_file_format"];
+	$out_file_format = $_POST["out_file_format"];
+	$out_file_ext = trim($_POST["out_file_ext"]);
 	$dealign_checkbox = is_checkbox_checked("dealign");		
 	if(isset($_POST["pre_align_in1"])){
 		$pre_align_file1_content = $_POST["pre_align_in1"]; 
@@ -51,14 +53,52 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 	//    dist_matr.txt
 	//    guide_tree.txt
 	// Output files:
-	//    out.txt
+	//    out.???
 	//    dist_matr_out.txt
 	//    guide_tree_out.txt
 	//    cluster_out.txt
 	
 	$progr_dir = "../../progr/";
 	$command = "\"".$progr_dir."clustalo.exe\"";
-	$command .= " --outfile=".$progr_dir."out.txt";
+	
+	
+	if(isset($out_file_format)){			
+		$command .= " --outfmt=".$out_file_format;
+	}
+
+	$out_file="out";
+	if(empty($out_file_ext)){
+		switch($out_file_format){
+			case "fasta":
+				$out_file .= ".fasta";
+				break;
+			case "clustal":
+				$out_file .= ".aln";
+				break;
+			case "msf":
+				$out_file .= ".msf";
+				break;
+			case "phylip":
+				$out_file .= ".phy";
+				break;
+			case "selex":
+				$out_file .= ".slx";
+				break;
+			case "stockholm":
+				$out_file .= ".sth";
+				break;
+			case "vienna":
+				$out_file .= ".vie";
+				break;
+			default: 
+				throw new Exception('Unsuported output format.');
+		}
+	}
+	else
+	{		
+		$out_file .= (substr( $out_file_ext, 0, 1 ) === "." ? $out_file_ext : ".".$out_file_ext);
+	}
+	$command .= " --outfile=".$progr_dir.$out_file;		
 	
 	if(empty($input_sequence)){
 		echo "<b>Error. Input sequence is missing<b>";
@@ -164,10 +204,12 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 	
 	$command .= " --force";
 	$command .= " > console_out.txt 2>&1";
+	
+	clean_files($progr_dir,$out_file);
 	`$command`;
 	
 	// Output files:
-	//    out.txt
+	//    out.???
 	//    dist_matr_out.txt
 	//    guide_tree_out.txt
 	//    cluster_out.txt
@@ -176,12 +218,12 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 	$output = str_replace("file ../../progr/input.txt", "file or input", $output);
 	$output .= "<br/>";
 	
-	if(file_exists($progr_dir."out.txt")){
-		$output .= "<h3>Подредена секвенция:</h3><br/>";
+	if(file_exists($progr_dir.$out_file)){
+		$output .= "<h3>Подредена секвенция:</h3>";
 		$output .= "<textarea name=\"ordered_seq\" rows=\"15\" cols=\"70\">";
-		$output .= read_file($progr_dir."out.txt");
-		unlink($progr_dir."out.txt");
+		$output .= read_file($progr_dir.$out_file);
 		$output .= "</textarea><br/>";
+		$output .= "<a href=\"includes/download.php?file=".$out_file."\">Свали изходния файл</a><br/><br/>";
 	}
 	else{
 		$output .= "<b>Неуспешно генериране на подредена секвенция. Вижте грешките по-горе.</b><br/>";
@@ -191,18 +233,21 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 		$output .= "<textarea name=\"dist_matr\" rows=\"15\" cols=\"70\">";
 		$output .= read_file($progr_dir."dist_matr_out.txt");
 		$output .= "</textarea><br/>";	
+		$output .= "<a href=\"includes/download.php?file=dist_matr_out.txt\">Свали матрицата на разпределението</a><br/><br/>";
 	}
 	if(file_exists($progr_dir."guide_tree_out.txt")){
-		$output .= "<h3>Дърво на следенето(guide-tree):</h3><br/>";
+		$output .= "<h3>Еволюционно дърво(guide-tree):</h3>";
 		$output .= "<textarea name=\"guide_tree\" rows=\"15\" cols=\"70\">";
 		$output .= read_file($progr_dir."guide_tree_out.txt");
 		$output .= "</textarea><br/>";	
+		$output .= "<a href=\"includes/download.php?file=guide_tree_out.txt\">Свали еволюционното дърво</a><br/><br/>";
 	}
 	if(file_exists($progr_dir."cluster_out.txt")){
-		$output .= "<h3>Клъстериране:</h3><br/>";
+		$output .= "<h3>Клъстериране:</h3>";
 		$output .= "<textarea name=\"cluster\" rows=\"15\" cols=\"70\">";
 		$output .= read_file($progr_dir."cluster_out.txt");
 		$output .= "</textarea><br/>";	
+		$output .= "<a href=\"includes/download.php?file=cluster_out.txt\">Свали клъстерирането</a><br/><br/>";
 	}
 	
 	echo $output;
@@ -267,6 +312,22 @@ function read_file($location){
 	}
 	else{
 		return "";
+	}
+}
+
+function clean_files($progr_dir,$out_file){
+
+	if(file_exists($progr_dir.$out_file)){
+		unlink($progr_dir.$out_file);
+	}
+	if(file_exists($progr_dir."dist_matr_out.txt")){
+		unlink($progr_dir."dist_matr_out.txt");
+	}
+	if(file_exists($progr_dir."guide_tree_out.txt")){
+		unlink($progr_dir."guide_tree_out.txt");
+	}
+	if(file_exists($progr_dir."cluster_out.txt")){
+		unlink($progr_dir."cluster_out.txt");
 	}
 }
 ?>
